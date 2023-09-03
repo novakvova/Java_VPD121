@@ -47,7 +47,13 @@ const CategoryCreatePage = () => {
         validationSchema: categorySchema
     });
 
-    const { values, errors, touched, handleChange, handleSubmit, setFieldValue, handleBlur } = formik;
+    const { values,
+        errors,
+        touched,
+        handleChange,
+        handleSubmit,
+        setFieldValue,
+        handleBlur } = formik;
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file =

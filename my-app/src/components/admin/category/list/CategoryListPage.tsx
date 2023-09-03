@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import http_common from "../../../../http_common.ts";
 import {ICategoryItem} from "./types.ts";
 import {Link} from "react-router-dom";
+import ModalDelete from "../../../common/ModalDelete.tsx";
 
 const CategoryListPage = () => {
     const [list, setList] = useState<ICategoryItem[]>([]);
@@ -13,6 +14,10 @@ const CategoryListPage = () => {
                 setList(resp.data);
             });
     }, []);
+
+    const deleteCategory = (id: number) => {
+        console.log("Delete by id", id);
+    }
     const content = list.map(item=> (
         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" key={item.id}>
             <td className="w-32 p-4">
@@ -27,12 +32,15 @@ const CategoryListPage = () => {
             </td>
             <td className="px-6 py-4">
                 <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Змінить</a>
-                <a href="#" className="ml-2 font-medium text-red-600 dark:text-red-500 hover:underline">Видалить</a>
+                <ModalDelete id={item.id} text={item.name} deleteFunc={deleteCategory}/>
             </td>
         </tr>
     ));
+
+
     return (
         <>
+
             <div className="mx-auto text-center">
                 <h1 className="text-3xl  font-bold text-black sm:text-5xl">Список категорій</h1>
             </div>
