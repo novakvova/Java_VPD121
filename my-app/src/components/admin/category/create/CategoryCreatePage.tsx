@@ -1,73 +1,186 @@
+import {ICategoryCreate} from "./types.ts";
+import * as Yup from "yup";
+import http_common from "../../../../http_common.ts";
+import {useNavigate} from "react-router-dom";
+import {useFormik} from "formik";
+import {ChangeEvent} from "react";
+
 const CategoryCreatePage = () => {
+
+    const init: ICategoryCreate = {
+        name: "",
+        image: null,
+        description: "",
+    };
+    const navigate = useNavigate();
+
+    const categorySchema = Yup.object().shape({
+        name: Yup.string()
+            .required("Name is required")
+            .max(255, "Name must be smaller"),
+        description: Yup.string()
+            .required("Description is required")
+            .max(4000, "Description must be smaller"),
+        image: Yup.mixed().required("Image is required"),
+    });
+
+    const onFormikSubmit = async (values: ICategoryCreate) => {
+        try {
+            await http_common.post(
+                "api/category",
+                values,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
+                }
+            );
+            navigate("/");
+        } catch {
+            console.log("Server error");
+        }
+    };
+
+    const formik = useFormik({
+        initialValues: init,
+        onSubmit: onFormikSubmit,
+        validationSchema: categorySchema
+    });
+
+    const { values, errors, touched, handleChange, handleSubmit, setFieldValue, handleBlur } = formik;
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file =
+            e.currentTarget.files && e.currentTarget.files[0];
+        if (file) {
+            setFieldValue(e.target.name, file);
+        }
+        e.target.value = "";
+    }
+
+
     return (
         <>
             <div className="mx-auto text-center">
-                <h1 className="text-3xl  font-bold text-black sm:text-5xl">Додати категорій</h1>
+                <h1 className="text-3xl  font-bold text-black sm:text-4xl">Додати категорій</h1>
             </div>
 
+            <form onSubmit={handleSubmit} className={"mt-4"}>
+                <i
+                    className="bi bi-arrow-left-circle-fill back-button"
+                    onClick={() => navigate("..")}
+                ></i>
 
-            <form>
-                <div className="relative z-0 w-full mb-6 group">
-                    <input type="email" name="floating_email" id="floating_email"
-                           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                           placeholder=" " required/>
-                    <label htmlFor="floating_email"
-                           className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Email
-                        address</label>
+                <div className="mb-6">
+                    <input
+                        onBlur={handleBlur}
+                        className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                            errors.name && touched.name
+                                ? "bg-red-50 border border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5 dark:bg-red-100 dark:border-red-400"
+                                : ""
+                        }`}
+                        type="text"
+                        placeholder="Name"
+                        name="name"
+                        value={values.name}
+                        aria-label="Name"
+                        aria-describedby="basic-addon2"
+                        onChange={handleChange}
+                    />
+                    {(errors.name && touched.name) && (
+                        <div className={"mt-2 text-sm text-red-600 dark:text-red-500"}>
+                            {errors.name}
+                        </div>
+                    )}
                 </div>
-                <div className="relative z-0 w-full mb-6 group">
-                    <input type="password" name="floating_password" id="floating_password"
-                           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                           placeholder=" " required/>
-                    <label htmlFor="floating_password"
-                           className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Password</label>
+
+                <div className="mb-6">
+              <textarea
+                  onBlur={handleBlur}
+                  className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                      errors.description && touched.description
+                          ? "bg-red-50 border border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5 dark:bg-red-100 dark:border-red-400"
+                          : ""
+                  }`}
+                  placeholder="Description"
+                  name="description"
+                  value={values.description}
+                  aria-label="Description"
+                  aria-describedby="basic-addon2"
+                  onChange={handleChange}
+              />
+                    {(errors.description && touched.description) && (
+                        <div className={"mt-2 text-sm text-red-600 dark:text-red-500"}>
+                            {errors.description}
+                        </div>
+                    )}
                 </div>
-                <div className="relative z-0 w-full mb-6 group">
-                    <input type="password" name="repeat_password" id="floating_repeat_password"
-                           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                           placeholder=" " required/>
-                    <label htmlFor="floating_repeat_password"
-                           className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Confirm
-                        password</label>
+
+
+                <div className="mb-6 items-center justify-center w-full">
+                    <label
+                        htmlFor="dropzone-file"
+                        className={`flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 ${
+                            errors.image && touched.image
+                                ? "border-red-500 dark:border-red-400 bg-red-50"
+                                : "dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                        }`}
+                    >
+                        {values.image ? (
+                            <img
+                                src={URL.createObjectURL(values.image)}
+                                alt="Selected"
+                                className="p-1 object-fill rounded-lg cursor-pointer"
+                                style={{ maxWidth: "100%", maxHeight: "100%" }}
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                <svg
+                                    className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 20 16"
+                                >
+                                    <path
+                                        stroke="currentColor"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                                    />
+                                </svg>
+                                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                    <span className="font-semibold">Click to upload</span> or
+                                    drag and drop
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    SVG, PNG, JPG
+                                </p>
+                            </div>
+                        )}
+                    </label>
+                    <input
+                        id="dropzone-file"
+                        type="file"
+                        className="hidden"
+                        name="image"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                    />
+                    {errors.image && touched.image && (
+                        <div className="mt-2 text-sm text-red-600 dark:text-red-500">
+                            {errors.image}
+                        </div>
+                    )}
                 </div>
-                <div className="grid md:grid-cols-2 md:gap-6">
-                    <div className="relative z-0 w-full mb-6 group">
-                        <input type="text" name="floating_first_name" id="floating_first_name"
-                               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                               placeholder=" " required/>
-                        <label htmlFor="floating_first_name"
-                               className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">First
-                            name</label>
-                    </div>
-                    <div className="relative z-0 w-full mb-6 group">
-                        <input type="text" name="floating_last_name" id="floating_last_name"
-                               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                               placeholder=" " required/>
-                        <label htmlFor="floating_last_name"
-                               className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Last
-                            name</label>
-                    </div>
-                </div>
-                <div className="grid md:grid-cols-2 md:gap-6">
-                    <div className="relative z-0 w-full mb-6 group">
-                        <input type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" name="floating_phone" id="floating_phone"
-                               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                               placeholder=" " required/>
-                        <label htmlFor="floating_phone"
-                               className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Phone
-                            number (123-456-7890)</label>
-                    </div>
-                    <div className="relative z-0 w-full mb-6 group">
-                        <input type="text" name="floating_company" id="floating_company"
-                               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                               placeholder=" " required/>
-                        <label htmlFor="floating_company"
-                               className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Company
-                            (Ex. Google)</label>
-                    </div>
-                </div>
-                <button type="submit"
-                        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit
+
+
+                <button
+                    type="submit"
+                    className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                >
+                    Create
                 </button>
             </form>
 

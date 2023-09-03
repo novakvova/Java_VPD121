@@ -16,7 +16,7 @@ const CategoryListPage = () => {
     const content = list.map(item=> (
         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" key={item.id}>
             <td className="w-32 p-4">
-                <img src="https://flowbite.com/docs/images/products/apple-watch.png" alt="Apple Watch"/>
+                <img src={`${http_common.getUri()}images/150_${item.image}`} alt="Apple Watch"/>
             </td>
             <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                 {item.name}
