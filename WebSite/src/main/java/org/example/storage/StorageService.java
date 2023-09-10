@@ -13,4 +13,6 @@ public interface StorageService {
     void  removeFile(String removeFile);
     Path load(String filename);
     String saveMultipartFile(MultipartFile file);
+    String saveImageFormat(MultipartFile file, FileSaveFormat format);
+
 }
