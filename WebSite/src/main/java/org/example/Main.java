@@ -1,5 +1,9 @@
 package org.example;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.example.services.SeedService;
 import org.example.storage.StorageProperties;
 import org.example.storage.StorageService;
@@ -13,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 // then press Enter. You can now see whitespace characters in your code.
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)
+@SecurityScheme(name="my-api", scheme="bearer", type= SecuritySchemeType.HTTP, in= SecuritySchemeIn.HEADER)
 public class Main {
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);

@@ -1,5 +1,6 @@
 package org.example.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.example.dto.product.ProductCreateDTO;
 import org.example.dto.product.ProductItemDTO;
@@ -20,6 +21,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("api/products")
+@SecurityRequirement(name="my-api")
 public class ProductController {
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
@@ -34,7 +36,7 @@ public class ProductController {
         productRepository.save(p);
         for (MultipartFile image : dto.getImages()) {
             var imageSave = storageService.saveImageFormat(image, FileSaveFormat.WEBP);
-            var pi = new ProductImageEntity()
+            var pi = ProductImageEntity
                     .builder()
                     .image(imageSave)
                     .product(p)

@@ -1,5 +1,6 @@
 package org.example.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.category.CategoryCreateDTO;
 import org.example.dto.category.CategoryItemDTO;
@@ -22,6 +23,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@SecurityRequirement(name="my-api")
 public class CategoryController {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper mapper;

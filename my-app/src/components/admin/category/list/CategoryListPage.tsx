@@ -7,8 +7,8 @@ import ModalDelete from "../../../common/ModalDelete.tsx";
 const CategoryListPage = () => {
     const [list, setList] = useState<ICategoryItem[]>([]);
     useEffect(() => {
-        // console.log("Loaded component");
-        http_common.get<ICategoryItem[]>("api/category")
+        console.log("Loaded component", http_common.defaults.headers.common["Authorization"]);
+        http_common.get<ICategoryItem[]>("api/category/")
             .then(resp=> {
                 //console.log("Server info", resp.data);
                 setList(resp.data);
